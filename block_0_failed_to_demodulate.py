@@ -36,8 +36,8 @@ class CoreModel(nn.Module):
     
 def build_features(x):
     """
-    输入：x shape [N,] complex
-    输出：features shape [N,6] float32
+    input：x shape [N,] complex
+    output：features shape [N,6] float32
     """
     I = x.real
     Q = x.imag
