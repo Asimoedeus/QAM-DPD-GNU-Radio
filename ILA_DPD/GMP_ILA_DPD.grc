@@ -1,0 +1,477 @@
+options:
+  parameters:
+    author: LI
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: default
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Not titled yet
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: excess_bw
+  id: variable
+  parameters:
+    comment: '[excessive bandwidth] for cosine filter'
+    value: '0.35'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [280, 224.0]
+    rotation: 0
+    state: enabled
+- name: nfilts
+  id: variable
+  parameters:
+    comment: The [number] of [Synchronized Filter Bank]
+    value: '32'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [704, 152.0]
+    rotation: 0
+    state: enabled
+- name: qam16
+  id: variable_constellation
+  parameters:
+    comment: ''
+    const_points: '[-1-1j, -1+1j, 1+1j, 1-1j]'
+    dims: '1'
+    normalization: digital.constellation.AMPLITUDE_NORMALIZATION
+    npwr: '1.0'
+    precision: '8'
+    rot_sym: '4'
+    soft_dec_lut: None
+    sym_map: '[0, 1, 3, 2]'
+    type: 16qam
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 424.0]
+    rotation: 0
+    state: true
+- name: rrc_taps
+  id: variable
+  parameters:
+    comment: ''
+    value: firdes.root_raised_cosine(1, sps, 1, excess_bw, 45)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1064, 136.0]
+    rotation: 0
+    state: enabled
+- name: rrc_taps_sync
+  id: variable
+  parameters:
+    comment: ''
+    value: firdes.root_raised_cosine(nfilts, nfilts, 1.0/float(sps), excess_bw, 11*sps*nfilts)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [448, 144.0]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '32000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [200, 12]
+    rotation: 0
+    state: enabled
+- name: sps
+  id: variable
+  parameters:
+    comment: The [number of samples] for every symbol
+    value: '4'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [912, 136.0]
+    rotation: 0
+    state: enabled
+- name: analog_random_source_x_0
+  id: analog_random_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    max: '256'
+    maxoutbuf: '0'
+    min: '0'
+    minoutbuf: '0'
+    num_samps: '16384'
+    repeat: 'True'
+    type: byte
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [0, 368.0]
+    rotation: 0
+    state: enabled
+- name: blocks_multiply_const_xx_0
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '1.5'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1080, 336.0]
+    rotation: 0
+    state: enabled
+- name: blocks_throttle_0_0_0_0
+  id: blocks_throttle
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    ignoretag: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samples_per_second: samp_rate
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1280, 344.0]
+    rotation: 0
+    state: enabled
+- name: digital_constellation_modulator_0_0_0_0
+  id: digital_constellation_modulator
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    constellation: qam16
+    differential: 'False'
+    excess_bw: excess_bw
+    log: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samples_per_symbol: sps
+    truncate: 'False'
+    verbose: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [304, 384.0]
+    rotation: 0
+    state: enabled
+- name: digital_pfb_clock_sync_xxx_0_1_0
+  id: digital_pfb_clock_sync_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    filter_size: nfilts
+    init_phase: nfilts/2
+    loop_bw: 6.28/100.0
+    max_dev: '1.5'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    osps: '1'
+    sps: sps
+    taps: rrc_taps_sync
+    type: ccf
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1504, 248.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_1
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\n\nclass PA_model_GMP(gr.sync_block):\n\
+      \    \"\"\"\n    Generalized Memory Polynomial (GMP) PA Model Block.\n\n   \
+      \ This block implements a GMP model defined by the equation:\n    y[n] = sum_{k=1\
+      \ to K} sum_{q=0 to Q} a_kq * x[n-q] * |x[n-q]|^{k-1}\n\n    The coefficients\
+      \ 'a_kq' are provided as a 2D list or numpy array.\n    \"\"\"\n    def __init__(self,\
+      \ coeffs= [\n    [0.95+0.01j, 0.05-0.02j],  # k=1: a_10, a_11 (\u7EBF\u6027\u9879\
+      \u548C\u8BB0\u5FC6\u9879)\n    [0.00-0.00j, 0.00+0.00j],  # k=2: a_20, a_21\
+      \ (\u4E3B\u8981\u5F15\u8D77AM/PM)\n    [-0.1-0.08j, -0.02-0.01j]  # k=3: a_30,\
+      \ a_31 (\u4E3B\u8981\u5F15\u8D77AM/AM)\n]):\n        \"\"\"\n        Args:\n\
+      \            coeffs (list or numpy.ndarray): A 2D array-like structure for the\n\
+      \                complex coefficients a_kq. The shape should be K x (Q+1).\n\
+      \                Example: [[a_10, a_11], [a_20, a_21], [a_30, a_31]]\n     \
+      \           for K=3, Q=1.\n        \"\"\"\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='PA_model_GMP',\n            in_sig=[np.complex64],\n\
+      \            out_sig=[np.complex64]\n        )\n\n        # --- \u4ECE\u7CFB\
+      \u6570\u77E9\u9635\u4E2D\u63A8\u5BFC\u6A21\u578B\u53C2\u6570 ---\n        self.coeffs\
+      \ = np.array(coeffs, dtype=np.complex64)\n        if self.coeffs.ndim != 2:\n\
+      \            raise ValueError(\"Coefficients must be a 2D array-like object.\"\
+      )\n\n        # K is the number of rows (non-linearity order)\n        # Q is\
+      \ (number of columns - 1) (memory depth)\n        self.K = self.coeffs.shape[0]\n\
+      \        self.Q = self.coeffs.shape[1] - 1\n        \n        if self.Q < 0:\n\
+      \            raise ValueError(\"Coefficients matrix must have at least one column.\"\
+      )\n\n        # --- \u521D\u59CB\u5316\u7528\u4E8E\u5B58\u50A8\u5386\u53F2\u6837\
+      \u672C\u7684\u72B6\u6001\u53D8\u91CF ---\n        # self.history stores the\
+      \ last Q input samples for memory effects.\n        self.history = np.zeros(self.Q,\
+      \ dtype=np.complex64)\n\n    def work(self, input_items, output_items):\n  \
+      \      # input_items[0] is the new block of input samples\n        # output_items[0]\
+      \ is where we write our output samples\n        x_new = input_items[0]\n   \
+      \     y_out = output_items[0]\n        \n        # --- \u6838\u5FC3\u5904\u7406\
+      \u903B\u8F91 ---\n\n        # 1. \u5C06\u5386\u53F2\u6837\u672C\u4E0E\u65B0\u8F93\
+      \u5165\u6837\u672C\u62FC\u63A5\uFF0C\u5F62\u6210\u4E00\u4E2A\u5B8C\u6574\u7684\
+      \u5DE5\u4F5C\u5411\u91CF\n        #    This allows us to compute y[n] which\
+      \ depends on x[n-q]\n        x_full = np.concatenate((self.history, x_new))\n\
+      \        \n        # \u83B7\u53D6\u65B0\u8F93\u5165\u7684\u957F\u5EA6\n    \
+      \    num_new_samples = len(x_new)\n        \n        # \u521D\u59CB\u5316\u8F93\
+      \u51FA\u4E3A\u96F6\n        # The output is a summation, so we start with zeros.\n\
+      \        y_out[:] = 0.0\n\n        # 2. \u6267\u884CGMP\u53CC\u91CD\u6C42\u548C\
+      \u8BA1\u7B97\n        # Outer loop over non-linearity order k (from 1 to K)\n\
+      \        for k_idx in range(self.K):\n            k = k_idx + 1 # k runs from\
+      \ 1 to K\n            # Inner loop over memory depth q (from 0 to Q)\n     \
+      \       for q in range(self.Q + 1):\n                # \u83B7\u53D6\u7CFB\u6570\
+      \ a_kq\n                a_kq = self.coeffs[k_idx, q]\n                \n   \
+      \             # \u83B7\u53D6\u5E26\u6709\u5EF6\u8FDF\u7684\u8F93\u5165\u4FE1\
+      \u53F7 x[n-q]\n                # For an output block of size N, the corresponding\
+      \ input\n                # slice from x_full is x_full[Q-q : Q-q+N]\n      \
+      \          delayed_input = x_full[self.Q - q : self.Q - q + num_new_samples]\n\
+      \                \n                # \u8BA1\u7B97\u5F53\u524D\u9879\u5E76\u7D2F\
+      \u52A0\u5230\u8F93\u51FA\n                # term = a_kq * x[n-q] * |x[n-q]|^{k-1}\n\
+      \                term = a_kq * delayed_input * (np.abs(delayed_input)**(k -\
+      \ 1))\n                y_out[:] += term\n\n        # 3. \u66F4\u65B0\u5386\u53F2\
+      \u8BB0\u5F55\uFF0C\u4E3A\u4E0B\u4E00\u6B21\u8C03\u7528work\u505A\u597D\u51C6\
+      \u5907\n        # The last Q samples of the full input vector become the new\
+      \ history.\n        self.history = x_full[-self.Q:] if self.Q > 0 else np.array([])\n\
+      \        \n        # 4. \u8FD4\u56DE\u5904\u7406\u7684\u6837\u672C\u6570\n \
+      \       return len(y_out)"
+    affinity: ''
+    alias: ''
+    coeffs: '[[1.50+0.01j, 0.05-0.02j],[0.00-0.00j, 0.00+0.00j],[-0.1-0.08j, -0.02-0.01j]]'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('PA_model_GMP', 'PA_model_GMP', [('coeffs', '[[(0.95+0.01j), (0.05-0.02j)],
+      [0j, 0j], [(-0.1-0.08j), (-0.02-0.01j)]]')], [('0', 'complex', 1)], [('0', 'complex',
+      1)], "\nGeneralized Memory Polynomial (GMP) PA Model Block.\n\nThis block implements
+      a GMP model defined by the equation:\ny[n] = sum_{k=1 to K} sum_{q=0 to Q} a_kq
+      * x[n-q] * |x[n-q]|^{k-1}\n\nThe coefficients 'a_kq' are provided as a 2D list
+      or numpy array.\n", ['coeffs'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [824, 360.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_1_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python block for ARVTDNN DPD model inference in\
+      \ GNU Radio\n\"\"\"\nimport numpy as np\nimport torch\nimport torch.nn as nn\n\
+      from gnuradio import gr\n\nclass ARVTDNN(nn.Module):\n    def __init__(self,\
+      \ input_dim, hidden_dims=[128, 64]):\n        super(ARVTDNN, self).__init__()\n\
+      \        layers = []\n        prev = input_dim\n        for h in hidden_dims:\n\
+      \            layers.append(nn.Linear(prev, h))\n            layers.append(nn.ReLU())\n\
+      \            prev = h\n        layers.append(nn.Linear(prev, 2))  # \u8F93\u51FA\
+      \ I/Q\n        self.net = nn.Sequential(*layers)\n\n    def forward(self, x):\n\
+      \        return self.net(x)\n\n\ndef extract_features(x, memory=3, order=3,\
+      \ order_memory=2):\n    \"\"\"\n    \u6784\u5EFA ARVTDNN \u7279\u5F81\uFF1A\u5EF6\
+      \u8FDF I/Q + \u5E45\u5EA6\u591A\u9879\u5F0F\n    \"\"\"\n    N = len(x) - memory\n\
+      \    feat_dim = (memory + 1) * 2 + (order - 1) * (order_memory + 1)\n    feats\
+      \ = np.zeros((N, feat_dim), dtype=np.float32)\n    for n in range(N):\n    \
+      \    idx = 0\n        # \u65F6\u6EDE I/Q\n        for m in range(memory + 1):\n\
+      \            feats[n, idx] = x[n + m].real; idx += 1\n            feats[n, idx]\
+      \ = x[n + m].imag; idx += 1\n        # \u5E45\u5EA6\u591A\u9879\u5F0F\n    \
+      \    for m in range(order_memory + 1):\n            amp = np.abs(x[n + m])\n\
+      \            for k in range(2, order + 1):\n                feats[n, idx] =\
+      \ amp**k; idx += 1\n    return feats\n\nclass blk(gr.sync_block):\n    \"\"\"\
+      ARVTDNN DPD Model Block\"\"\"\n    def __init__(self, model_path=\"C:\\Programming\\\
+      pythonProjects\\QAM-In-GNU-Radio-main\\ILA\\dpd_model.pth\", memory=3, order=3,\
+      \ order_memory=2, scale=1.0):\n        gr.sync_block.__init__(self,\n      \
+      \      name=\"ARVTDNN_DPD\",\n            in_sig=[np.complex64],\n         \
+      \   out_sig=[np.complex64])\n        self.model_path = model_path\n        self.memory\
+      \ = memory\n        self.order = order\n        self.order_memory = order_memory\n\
+      \        self.scale = scale\n        self.device = torch.device('cpu')\n\n \
+      \       # \u52A0\u8F7D\u6A21\u578B\n        input_dim = (self.memory + 1) *\
+      \ 2 + (self.order - 1) * (self.order_memory + 1)\n        self.net = ARVTDNN(input_dim).to(self.device)\n\
+      \        state = torch.load(self.model_path, map_location=self.device)\n   \
+      \     self.net.load_state_dict(state)\n        self.net.eval()\n\n        #\
+      \ \u4FDD\u7559\u5386\u53F2\u6837\u672C\n        self.buf = np.zeros(self.memory,\
+      \ dtype=np.complex64)\n\n    def work(self, input_items, output_items):\n  \
+      \      x_in = input_items[0]\n        N = len(x_in)\n        # \u62FC\u63A5\u5386\
+      \u53F2\u4E0E\u5F53\u524D\n        x = np.concatenate((self.buf, x_in)).astype(np.complex64)\n\
+      \        # \u5F52\u4E00\u5316\n        x_norm = x / self.scale\n        # \u7279\
+      \u5F81\u63D0\u53D6\n        feats = extract_features(x_norm, self.memory, self.order,\
+      \ self.order_memory)\n        # \u63A8\u65AD\n        with torch.no_grad():\n\
+      \            tensor = torch.from_numpy(feats).to(self.device)\n            pred\
+      \ = self.net(tensor).cpu().numpy()\n        # \u91CD\u6784\u590D\u4FE1\u53F7\
+      \n        dpd = (pred[:, 0] + 1j * pred[:, 1]) * self.scale\n        y = dpd.astype(np.complex64)\n\
+      \        # \u8F93\u51FA\u5E76\u66F4\u65B0\u5386\u53F2\n        output_items[0][:]\
+      \ = y\n        self.buf = x_in[-self.memory:]\n        return N\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    memory: '3'
+    minoutbuf: '0'
+    model_path: '''C:/Programming/pythonProjects/QAM-In-GNU-Radio-main/ILA/dpd_model.pth'''
+    order: '3'
+    order_memory: '2'
+    scale: '1.0'
+  states:
+    _io_cache: ('ARVTDNN_DPD', 'blk', [('model_path', "'C:\\\\Programming\\\\pythonProjects\\\\QAM-In-GNU-Radio-main\\\\ILA\\\\dpd_model.pth'"),
+      ('memory', '3'), ('order', '3'), ('order_memory', '2'), ('scale', '1.0')], [('0',
+      'complex', 1)], [('0', 'complex', 1)], 'ARVTDNN DPD Model Block', ['memory',
+      'model_path', 'order', 'order_memory', 'scale'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [576, 376.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_const_sink_x_0_0_0_0
+  id: qtgui_const_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'True'
+    axislabels: 'True'
+    color1: '"blue"'
+    color10: '"red"'
+    color2: '"red"'
+    color3: '"red"'
+    color4: '"red"'
+    color5: '"red"'
+    color6: '"red"'
+    color7: '"red"'
+    color8: '"red"'
+    color9: '"red"'
+    comment: ''
+    grid: 'False'
+    gui_hint: 3,2,1,1
+    label1: ''
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    legend: 'True'
+    marker1: '0'
+    marker10: '0'
+    marker2: '0'
+    marker3: '0'
+    marker4: '0'
+    marker5: '0'
+    marker6: '0'
+    marker7: '0'
+    marker8: '0'
+    marker9: '0'
+    name: '""'
+    nconnections: '1'
+    size: '1024'
+    style1: '0'
+    style10: '0'
+    style2: '0'
+    style3: '0'
+    style4: '0'
+    style5: '0'
+    style6: '0'
+    style7: '0'
+    style8: '0'
+    style9: '0'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '""'
+    type: complex
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    xmax: '2'
+    xmin: '-2'
+    ymax: '2'
+    ymin: '-2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1928, 264.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [analog_random_source_x_0, '0', digital_constellation_modulator_0_0_0_0, '0']
+- [blocks_multiply_const_xx_0, '0', blocks_throttle_0_0_0_0, '0']
+- [blocks_throttle_0_0_0_0, '0', digital_pfb_clock_sync_xxx_0_1_0, '0']
+- [digital_constellation_modulator_0_0_0_0, '0', epy_block_1_0, '0']
+- [digital_pfb_clock_sync_xxx_0_1_0, '0', qtgui_const_sink_x_0_0_0_0, '0']
+- [epy_block_1, '0', blocks_multiply_const_xx_0, '0']
+- [epy_block_1_0, '0', epy_block_1, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.12.0
