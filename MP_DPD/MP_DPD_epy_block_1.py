@@ -3,12 +3,12 @@ from gnuradio import gr
 
 class PA_model_GMP(gr.sync_block):
     """
-    Generalized Memory Polynomial (GMP) PA Model Block.
+    Generalized Memory Polynomial (GMP) PA Model Block
 
-    This block implements a GMP model defined by the equation:
+    This block implements a GMP model defined by the equation below:
     y[n] = sum_{k=1 to K} sum_{q=0 to Q} a_kq * x[n-q] * |x[n-q]|^{k-1}
 
-    The coefficients 'a_kq' are provided as a 2D list or numpy array.
+    where the coefficients 'a_kq' are provided as a 2D list or numpy array
     """
     def __init__(self, coeffs= [
     [0.95+0.01j, 0.05-0.02j],  # k=1: a_10, a_11 (线性项和记忆项)
@@ -34,8 +34,8 @@ class PA_model_GMP(gr.sync_block):
         if self.coeffs.ndim != 2:
             raise ValueError("Coefficients must be a 2D array-like object.")
 
-        # K is the number of rows (non-linearity order)
-        # Q is (number of columns - 1) (memory depth)
+        # K: the number of rows (non-linearity order)
+        # Q: (number of columns - 1) (memory depth)
         self.K = self.coeffs.shape[0]
         self.Q = self.coeffs.shape[1] - 1
         
@@ -52,7 +52,6 @@ class PA_model_GMP(gr.sync_block):
         x_new = input_items[0]
         y_out = output_items[0]
         
-        # --- 核心处理逻辑 ---
 
         # 1. 将历史样本与新输入样本拼接，形成一个完整的工作向量
         #    This allows us to compute y[n] which depends on x[n-q]
@@ -61,20 +60,19 @@ class PA_model_GMP(gr.sync_block):
         # 获取新输入的长度
         num_new_samples = len(x_new)
         
-        # 初始化输出为零
-        # The output is a summation, so we start with zeros.
+        # The output is a summation, so start with zero
         y_out[:] = 0.0
 
-        # 2. 执行GMP双重求和计算
+        # 2. GMP双重求和计算
         # Outer loop over non-linearity order k (from 1 to K)
         for k_idx in range(self.K):
             k = k_idx + 1 # k runs from 1 to K
             # Inner loop over memory depth q (from 0 to Q)
             for q in range(self.Q + 1):
-                # 获取系数 a_kq
+                # get系数 a_kq
                 a_kq = self.coeffs[k_idx, q]
                 
-                # 获取带有延迟的输入信号 x[n-q]
+                # get带有延迟的输入信号 x[n-q]
                 # For an output block of size N, the corresponding input
                 # slice from x_full is x_full[Q-q : Q-q+N]
                 delayed_input = x_full[self.Q - q : self.Q - q + num_new_samples]
@@ -88,5 +86,5 @@ class PA_model_GMP(gr.sync_block):
         # The last Q samples of the full input vector become the new history.
         self.history = x_full[-self.Q:] if self.Q > 0 else np.array([])
         
-        # 4. 返回处理的样本数
+        # 返回处理的样本数
         return len(y_out)
