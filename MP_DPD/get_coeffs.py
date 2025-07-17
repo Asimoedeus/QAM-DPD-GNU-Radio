@@ -53,8 +53,7 @@ def estimate_mp_dpd_coeffs(z, y, K=5, Q=9):
 
 if __name__ == "__main__":
     # ————————————
-    # 1) 读取 CSV
-    #    假设 train_input.csv, train_output.csv 放在脚本同目录
+    # 1) read CSV
     df_in  = pd.read_csv("../GMP_PA/datasets/train_input.csv")   # 列名 I, Q
     df_out = pd.read_csv("../GMP_PA/datasets/train_output.csv")  # 列名 I, Q
 
@@ -66,7 +65,7 @@ if __name__ == "__main__":
     Q = 1   # Memory depth
     coeffs_matrix, a_vec = estimate_mp_dpd_coeffs(z, y, K=K, Q=Q)
 
-    # 3) 打印成 Python 列表格式，拷贝到 GNU Radio Block
+    # 3) 打印成 Python 列表格式
     P = (K + 1)//2
     print("coeffs = [")
     for row in coeffs_matrix:
@@ -79,11 +78,3 @@ if __name__ == "__main__":
     [3.472112e-02+1.207297e-01j, -4.867465e-02+3.718652e-02j],
     [-8.472962e-03-5.038591e-02j, 1.019886e-02+3.677094e-02j],
     ]
-    '''
-    # (可选) 保存为 .npy 或 .npz
-    # np.save("dpd_coeffs_matrix.npy", coeffs_matrix)
-    # np.savez("dpd_coeffs.npz", matrix=coeffs_matrix, vector=a_vec)
-
-    # 4) 你就可以在 GRC 中这样实例化：
-    #    from your_block_module import MP_DPD
-    #    block = MP_DPD(coeffs=coeffs, K=5, Q=9)
