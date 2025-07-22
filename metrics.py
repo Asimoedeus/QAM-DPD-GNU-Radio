@@ -2,7 +2,7 @@ import numpy as np
 
 
 def load_iq_csv(path: str) -> np.ndarray:
-    """Load a CSV file with columns I and Q into a complex numpy array."""
+    """Load CSV file with columns I and Q into a complex numpy array."""
     data = np.genfromtxt(path, delimiter=",", skip_header=1, dtype=np.float32)
     return data[:, 0] + 1j * data[:, 1]
 
